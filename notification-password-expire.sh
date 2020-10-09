@@ -10,8 +10,6 @@ alertDaysThreshold='7'
 
 #------- Do not modify below this line ------
 user=$(ls -la /dev/console | cut -d " " -f 4)
-echo ${user}
-user='takashi'
 passwordExpirationDate=$(
     curl -s \
         -X 'POST' \
@@ -43,7 +41,7 @@ echo "${user} password will expire in ${daysToExpiration} days"
 if [ "$daysToExpiration" -le "$alertDaysThreshold" ]; then
     echo "${daysToExpiration} within alertDaysThreshold of ${alertDaysThreshold} prompting user"
 
-    userPrompt=$(sudo -u hasegawa osascript -e '
+    userPrompt=$(sudo -u ${user} osascript -e '
         display dialog "パスワードの期限が残り'"${daysToExpiration}"'日で切れます。\n OKをクリックし表示された手順に従いパスワードを更新してください。" buttons {"OK","Cancel"} default button 1 with title "パスワード有効期限通知" with icon file "Applications:Jumpcloud.app:Contents:Resources:AppIcon.icns"
         set tmp to result
         set btn to button returned of tmp
@@ -52,7 +50,7 @@ if [ "$daysToExpiration" -le "$alertDaysThreshold" ]; then
 
     if [ $userPrompt = "OK" ]; then
         echo "OPEN"
-        `sudo -u hasegawa /usr/bin/open -a '/Applications/Google Chrome.app' "https://www.yahoo.co.jp"`
+        `sudo -u ${user} /usr/bin/open -a '/Applications/Google Chrome.app' "https://www.yahoo.co.jp"`
         echo "OPEN-END"
     fi
 
